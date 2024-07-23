@@ -1,0 +1,5 @@
+﻿homepage: "https://webtru.io/"
+documentation: "https://webtru.zendesk.com/hc/articles/27744617473689"
+versions:
+  - sha: 6d302dc842ab88d3b58a6fd414639cf5972274ac
+    changeNotes: Initial release.
