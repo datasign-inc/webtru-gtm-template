@@ -70,6 +70,9 @@ const updateConsentState = require('updateConsentState');
 const encodeUri = require("encodeUri");
 const setInWindow = require('setInWindow');
 const injectScript = require("injectScript");
+const gtagSet = require('gtagSet');
+
+gtagSet('developer_id.dNWE3Yj', true);
 
 const updateConsent = (payload) => {
     updateConsentState(payload);
@@ -84,7 +87,7 @@ if (data.useGoogleConsentMode) {
         ad_user_data: "denied",
         ad_personalization: "denied",
         wait_for_update: 500,
-    });    
+    });
 }
 
 const scriptURL = "https://cmp.datasign.co/v2/" + encodeUri(data.tagId) + "/cmp.js?gcm=v2";
@@ -347,6 +350,32 @@ ___WEB_PERMISSIONS___
       "isEditedByUser": true
     },
     "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "write_data_layer",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "keyPatterns",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 1,
+                "string": "developer_id.dNWE3Yj"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
   }
 ]
 
@@ -358,6 +387,6 @@ scenarios: []
 
 ___NOTES___
 
-Created on 2024/7/22 18:40:22
+Created on 2024/9/5 15:43:55
 
 
