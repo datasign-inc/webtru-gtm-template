@@ -1,4 +1,4 @@
-﻿___TERMS_OF_SERVICE___
+___TERMS_OF_SERVICE___
 
 By creating or modifying this file you agree to Google Tag Manager's Community
 Template Gallery Developer Terms of Service available at
@@ -14,7 +14,6 @@ ___INFO___
   "version": 1,
   "securityGroups": [],
   "displayName": "webtru CMP",
-  "categories": ["TAG_MANAGEMENT"],
   "brand": {
     "id": "brand_dummy",
     "displayName": "",
@@ -56,6 +55,117 @@ ___TEMPLATE_PARAMETERS___
       }
     ],
     "simpleValueType": true
+  },
+  {
+    "type": "GROUP",
+    "name": "defaultConsentSettingsGroup",
+    "displayName": "Default Consent Settings by Region",
+    "groupStyle": "ZIPPY_OPEN_ON_PARAM",
+    "subParams": [
+      {
+        "type": "PARAM_TABLE",
+        "name": "defaultConsentSettings",
+        "displayName": "",
+        "paramTableColumns": [
+          {
+            "param": {
+              "type": "TEXT",
+              "name": "region",
+              "displayName": "Region",
+              "simpleValueType": true,
+              "help": "Specify the regions to which this setting applies, separated by commas (\u003ca href\u003d\"https://en.wikipedia.org/wiki/ISO_3166-2#current-codes\" target\u003d\"_blank\"\u003ecomplies with ISO 3166-2\u003c/a\u003e).",
+              "valueValidators": [
+                {
+                  "type": "NON_EMPTY"
+                }
+              ],
+              "textAsList": false
+            },
+            "isUnique": true
+          },
+          {
+            "param": {
+              "type": "SELECT",
+              "name": "ad_storage",
+              "displayName": "ad_storage",
+              "macrosInSelect": false,
+              "selectItems": [
+                {
+                  "value": "denied",
+                  "displayValue": "denied"
+                },
+                {
+                  "value": "granted",
+                  "displayValue": "granted"
+                }
+              ],
+              "simpleValueType": true
+            },
+            "isUnique": false
+          },
+          {
+            "param": {
+              "type": "SELECT",
+              "name": "analytics_storage",
+              "displayName": "analytics_storage",
+              "macrosInSelect": false,
+              "selectItems": [
+                {
+                  "value": "denied",
+                  "displayValue": "denied"
+                },
+                {
+                  "value": "granted",
+                  "displayValue": "granted"
+                }
+              ],
+              "simpleValueType": true
+            },
+            "isUnique": false
+          },
+          {
+            "param": {
+              "type": "SELECT",
+              "name": "ad_user_data",
+              "displayName": "ad_user_data",
+              "macrosInSelect": false,
+              "selectItems": [
+                {
+                  "value": "denied",
+                  "displayValue": "denied"
+                },
+                {
+                  "value": "granted",
+                  "displayValue": "granted"
+                }
+              ],
+              "simpleValueType": true
+            },
+            "isUnique": false
+          },
+          {
+            "param": {
+              "type": "SELECT",
+              "name": "ad_personalization",
+              "displayName": "ad_personalization",
+              "macrosInSelect": false,
+              "selectItems": [
+                {
+                  "value": "denied",
+                  "displayValue": "denied"
+                },
+                {
+                  "value": "granted",
+                  "displayValue": "granted"
+                }
+              ],
+              "simpleValueType": true
+            },
+            "isUnique": false
+          }
+        ]
+      }
+    ]
   }
 ]
 
@@ -71,27 +181,66 @@ const encodeUri = require("encodeUri");
 const setInWindow = require('setInWindow');
 const injectScript = require("injectScript");
 const gtagSet = require('gtagSet');
-
-gtagSet('developer_id.dNWE3Yj', true);
-
-const updateConsent = (payload) => {
+/*
+ *   Splits the input string using comma as a delimiter, returning an array of
+ *   strings
+ */
+const splitInput = (input) => {
+  return input.split(',')
+      .map(entry => entry.trim())
+      .filter(entry => entry.length !== 0);
+};
+/*
+ *   Processes a row of input from the default settings table, returning an object
+ *   which can be passed as an argument to setDefaultConsentState
+ */
+const parseCommandData = (settings) => {
+  const commandData = {};
+  if (settings.region) {
+    commandData.region = splitInput(settings.region);
+  }
+  for (const key in settings) {
+    if (key != 'region') {
+      commandData[key] = settings[key];
+    }
+  }
+  return commandData;
+};
+/*
+ *   Executes the default command, sets the developer ID, and sets up the consent
+ *   update callback
+ */
+const main = (data) => {
+  gtagSet('developer_id.dNWE3Yj', true);
+  
+  const updateConsent = (payload) => {
     updateConsentState(payload);
     log('updateConsentState: payload = ', payload);
-};
-setInWindow("webtruGcmUpdateListener", updateConsent, true);
-
-if (data.useGoogleConsentMode) {
-    setDefaultConsentState({
-        ad_storage: "denied",
-        analytics_storage: "denied",
-        ad_user_data: "denied",
-        ad_personalization: "denied",
-        wait_for_update: 500,
+  };
+  setInWindow("webtruGcmUpdateListener", updateConsent, true);
+  
+  if (data.useGoogleConsentMode) {
+    // Set reasion default consent state(s)
+    (data.defaultConsentSettings || []).forEach(settings => {
+      const defaultData = parseCommandData(settings);
+      defaultData.wait_for_update = 500;
+      setDefaultConsentState(defaultData);
     });
-}
+    // Set all default consent state
+    setDefaultConsentState({
+      ad_storage: "denied",
+      analytics_storage: "denied",
+      ad_user_data: "denied",
+      ad_personalization: "denied",
+      wait_for_update: 500,
+    });
+  }
+  
+  const scriptURL = "https://cmp.datasign.co/v2/" + encodeUri(data.tagId) + "/cmp.js?gcm=v2";
+  injectScript(scriptURL, data.gtmOnSuccess, data.gtmOnFailure);
+};
 
-const scriptURL = "https://cmp.datasign.co/v2/" + encodeUri(data.tagId) + "/cmp.js?gcm=v2";
-injectScript(scriptURL, data.gtmOnSuccess, data.gtmOnFailure);
+main(data);
 
 
 ___WEB_PERMISSIONS___
