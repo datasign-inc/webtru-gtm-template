@@ -14,6 +14,7 @@ ___INFO___
   "version": 1,
   "securityGroups": [],
   "displayName": "webtru CMP",
+  "categories": ["TAG_MANAGEMENT"],
   "brand": {
     "id": "brand_dummy",
     "displayName": "",
