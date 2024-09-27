@@ -1,5 +1,7 @@
 ﻿homepage: "https://webtru.io/"
-documentation: "https://webtru.zendesk.com/hc/articles/27744617473689"
+documentation: "https://webtru.zendesk.com/hc/ja/articles/36398940797593"
 versions:
+  - sha: 69ef498d07c9dcc27458ba64b7e08278a563349c
+    changeNotes: Add default consent settings.
   - sha: 7077119aabb92025e2d0ddd3be5611d07eb38bdf
     changeNotes: Initial release.
