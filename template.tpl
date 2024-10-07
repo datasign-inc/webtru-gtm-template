@@ -59,6 +59,43 @@ ___TEMPLATE_PARAMETERS___
   },
   {
     "type": "GROUP",
+    "name": "dataAttributesGroup",
+    "displayName": "Data Attributes",
+    "groupStyle": "ZIPPY_OPEN_ON_PARAM",
+    "subParams": [
+      {
+        "type": "PARAM_TABLE",
+        "name": "dataAttributes",
+        "displayName": "",
+        "paramTableColumns": [
+          {
+            "param": {
+              "type": "TEXT",
+              "name": "value",
+              "displayName": "Attribute",
+              "simpleValueType": true,
+              "valueHint": "data-*\u003d\"xxx\"",
+              "valueValidators": [
+                {
+                  "type": "NON_EMPTY"
+                },
+                {
+                  "type": "REGEX",
+                  "args": [
+                    "^data-[^\\s]*\u003d[\u0027\"][^\u0027\"]*[\u0027\"]$"
+                  ],
+                  "errorMessage": "Please enter in the data attribute format."
+                }
+              ]
+            },
+            "isUnique": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "GROUP",
     "name": "defaultConsentSettingsGroup",
     "displayName": "Default Consent Settings by Region",
     "groupStyle": "ZIPPY_OPEN_ON_PARAM",
@@ -208,6 +245,30 @@ const parseCommandData = (settings) => {
   return commandData;
 };
 /*
+ *   Converts an array of data attributes into a list of URL query parameter strings.
+ *
+ */
+const convertInputAttributesToQueryParams = (dataAttributes) => {
+  return dataAttributes
+    .map(item => {
+      const parts = item.value.split('=');
+      const key = parts[0].trim();
+      const value = parts[1].trim().slice(1, -1);
+      return encodeUri(key) + "=" + encodeUri(value);
+    });
+};
+/*
+ *   Processes input tag ID and data attributes,
+ *   Return the src of the script tag.
+ */
+const createScriptURL = (tagId, dataAttributes) => {
+  const requiredParams = ["gcm=v2"];
+  const inputParams = convertInputAttributesToQueryParams(dataAttributes);
+  const queryString = requiredParams.concat(inputParams).join('&');
+  
+  return "https://cmp.datasign.co/v2/" + encodeUri(tagId) + "/cmp.js?" + queryString;
+};
+/*
  *   Executes the default command, sets the developer ID, and sets up the consent
  *   update callback
  */
@@ -236,8 +297,8 @@ const main = (data) => {
       wait_for_update: 500,
     });
   }
-  
-  const scriptURL = "https://cmp.datasign.co/v2/" + encodeUri(data.tagId) + "/cmp.js?gcm=v2";
+
+  const scriptURL = createScriptURL(data.tagId, data.dataAttributes || []);
   injectScript(scriptURL, data.gtmOnSuccess, data.gtmOnFailure);
 };
 
