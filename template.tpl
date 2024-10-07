@@ -59,43 +59,6 @@ ___TEMPLATE_PARAMETERS___
   },
   {
     "type": "GROUP",
-    "name": "dataAttributesGroup",
-    "displayName": "Data Attributes",
-    "groupStyle": "ZIPPY_OPEN_ON_PARAM",
-    "subParams": [
-      {
-        "type": "PARAM_TABLE",
-        "name": "dataAttributes",
-        "displayName": "",
-        "paramTableColumns": [
-          {
-            "param": {
-              "type": "TEXT",
-              "name": "value",
-              "displayName": "Attribute",
-              "simpleValueType": true,
-              "valueHint": "data-*\u003d\"xxx\"",
-              "valueValidators": [
-                {
-                  "type": "NON_EMPTY"
-                },
-                {
-                  "type": "REGEX",
-                  "args": [
-                    "^data-[^\\s]*\u003d[\u0027\"][^\u0027\"]*[\u0027\"]$"
-                  ],
-                  "errorMessage": "Please enter in the data attribute format."
-                }
-              ]
-            },
-            "isUnique": true
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "type": "GROUP",
     "name": "defaultConsentSettingsGroup",
     "displayName": "Default Consent Settings by Region",
     "groupStyle": "ZIPPY_OPEN_ON_PARAM",
@@ -200,6 +163,43 @@ ___TEMPLATE_PARAMETERS___
               "simpleValueType": true
             },
             "isUnique": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "GROUP",
+    "name": "dataAttributesGroup",
+    "displayName": "Data Attributes",
+    "groupStyle": "ZIPPY_OPEN_ON_PARAM",
+    "subParams": [
+      {
+        "type": "PARAM_TABLE",
+        "name": "dataAttributes",
+        "displayName": "",
+        "paramTableColumns": [
+          {
+            "param": {
+              "type": "TEXT",
+              "name": "value",
+              "displayName": "Attribute",
+              "simpleValueType": true,
+              "valueHint": "data-*\u003d\"xxx\"",
+              "valueValidators": [
+                {
+                  "type": "NON_EMPTY"
+                },
+                {
+                  "type": "REGEX",
+                  "args": [
+                    "^data-[^\\s]*\u003d[\u0027\"][^\u0027\"]*[\u0027\"]$"
+                  ],
+                  "errorMessage": "Please enter in the data attribute format."
+                }
+              ]
+            },
+            "isUnique": true
           }
         ]
       }
