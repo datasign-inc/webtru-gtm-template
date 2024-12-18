@@ -204,6 +204,24 @@ ___TEMPLATE_PARAMETERS___
         ]
       }
     ]
+  },
+  {
+    "type": "SELECT",
+    "name": "serviceProvider",
+    "displayName": "ServiceProvider",
+    "macrosInSelect": false,
+    "selectItems": [
+      {
+        "value": "webtru",
+        "displayValue": "webtru"
+      },
+      {
+        "value": "CloudCIRCUS",
+        "displayValue": "CloudCIRCUS"
+      }
+    ],
+    "simpleValueType": true,
+    "defaultValue": "webtru"
   }
 ]
 
@@ -261,12 +279,17 @@ const convertInputAttributesToQueryParams = (dataAttributes) => {
  *   Processes input tag ID and data attributes,
  *   Return the src of the script tag.
  */
-const createScriptURL = (tagId, dataAttributes) => {
+const createScriptURL = (tagId, dataAttributes, serviceProvider) => {
   const requiredParams = ["gcm=v2"];
   const inputParams = convertInputAttributesToQueryParams(dataAttributes);
   const queryString = requiredParams.concat(inputParams).join('&');
-
-  return "https://cmp.datasign.co/v2/" + encodeUri(tagId) + "/cmp.js?" + queryString;
+  
+  let url = "https://cmp.datasign.co/v2/";
+  if (serviceProvider === "CloudCIRCUS") {
+    url = "https://cmp.webtru.cloud-circus.com/v2/";
+  }
+  
+  return url + encodeUri(tagId) + "/cmp.js?" + queryString;
 };
 /*
  *   Executes the default command, sets the developer ID, and sets up the consent
@@ -274,13 +297,13 @@ const createScriptURL = (tagId, dataAttributes) => {
  */
 const main = (data) => {
   gtagSet('developer_id.dNWE3Yj', true);
-
+  
   const updateConsent = (payload) => {
     updateConsentState(payload);
     log('updateConsentState: payload = ', payload);
   };
   setInWindow("webtruGcmUpdateListener", updateConsent, true);
-
+  
   if (data.useGoogleConsentMode) {
     // Set reasion default consent state(s)
     (data.defaultConsentSettings || []).forEach(settings => {
@@ -298,7 +321,7 @@ const main = (data) => {
     });
   }
 
-  const scriptURL = createScriptURL(data.tagId, data.dataAttributes || []);
+  const scriptURL = createScriptURL(data.tagId, data.dataAttributes || [], data.serviceProvider);
   injectScript(scriptURL, data.gtmOnSuccess, data.gtmOnFailure);
 };
 
@@ -405,6 +428,10 @@ ___WEB_PERMISSIONS___
               {
                 "type": 1,
                 "string": "https://cmp.datasign.co/v2/*"
+              },
+              {
+                "type": 1,
+                "string": "https://cmp.webtru.cloud-circus.com/v2/*"
               }
             ]
           }
